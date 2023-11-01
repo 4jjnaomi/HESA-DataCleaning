@@ -51,10 +51,14 @@ def prepare_df(dfdata):
                                             'Table-4': 'Transport and environment',
                                             'Table-5': 'Finances and people'})
     print('\nThe columns of the prepared dataset are: \n', df_replaced.columns)
-    #TODO: Remove the percentage sign from the 'Value' column
-    #df_replaced.astype({'Value': 'float64'}).dtypes
+    # TODO: Explain this in the pdf
+    df_numeric_values = df_replaced[pd.to_numeric(df_replaced['Value'], errors='coerce').notnull()]
+    df_numeric_values.loc[:, 'Value'] = df_numeric_values['Value'].str.rstrip('%')
+    df_numeric_values = df_numeric_values.astype({'Value': 'float64'})
 
-    df_prepared = df_replaced
+    df_prepared = df_numeric_values
+
+    print("\nThe data types of the prepared dataset are: \n", df_prepared.dtypes)
 
     prepared_dataset_filepath = Path(__file__).parent.joinpath('dataset','dataset_prepared.csv')
     df_prepared.to_csv(prepared_dataset_filepath, index=False)
@@ -70,7 +74,26 @@ def explore_data(df_prepared):
         
         """
     
-    df_prepared.groupby('Category marker')['Value'].plot(kind='box', subplots=True, layout=(3,3), sharex=False, sharey=False)
+    #TODO: Explain the following code in the pdf + the image generated
+    plt.rc('axes', titlesize=4)
+    plt.rc('axes', labelsize=4)
+    grouped = df_prepared.groupby('Category marker')
+    #rowlength = int((grouped.ngroups+3)/4)
+    #fig, axs = plt.subplots(4, rowlength, gridspec_kw=dict(wspace=0.5, hspace=0.5))
+
+    #Create a new figure for each boxplot for value in each category marker group, where each figure is not a subplot
+    for grp in grouped['Value']:
+        plt.figure()
+        grp[1].plot(kind='box', title=grp[0])
+        plt.title(grp[0])
+        plt.tick_params(axis='both', which='major', labelsize=7)
+    
+
+    #for grp, ax in zip(grouped['Value'], axs.flatten()):
+        #grp[1].plot(kind='hist', ax=ax, title=grp[0])
+        #ax.title.set_size(6)
+        #ax.tick_params(axis='both', which='major', labelsize=7)
+    
     plt.show()
 
 if __name__ == "__main__":
