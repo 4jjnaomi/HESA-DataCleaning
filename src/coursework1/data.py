@@ -4,8 +4,9 @@ import matplotlib
 matplotlib.use('TkAgg')
 import matplotlib.pyplot as plt
 import pandas as pd
+import seaborn as sns
 
-
+#Function including docstring that will print information that allows understanding of the raw DataFrame
 def understand_df(dfdata):
     """Prints information that allows understanding of the DataFrame
 
@@ -14,21 +15,28 @@ def understand_df(dfdata):
     """
     print('\nRAW DATASET INFORMATION\n')
 
-    #The following code will provide information on the raw dataset
+    #Printing the basic information on the raw dataset
     print("\nThe shape of the dataset is: \n", dfdata.shape)
     print("\nThe columns of the dataset are: \n", dfdata.columns)
     print("\nThe first 5 rows of the dataset are: \n", dfdata.head(5))
     print("\nThe last 5 rows of the dataset are: \n", dfdata.tail(5))
+
+    #Printing the unique values in the Country and Regionn columns to get an idea of the univeristies included in the dataset
     print("The unique values in the column 'Country of HE provider' are: \n", dfdata['Country of HE provider'].unique())
     print("The unique values in the column 'Region of HE provider' are: \n", dfdata['Region of HE provider'].unique())
+
+    #Printing the data types of the columns in the dataset
     print("\nThe data types of the dataset are: \n", dfdata.dtypes)
     
+    #Printing the number of null values in each column
     dfdata_null_columns = dfdata.isnull().sum()
     print("\nThe number of null values in each column is: \n", dfdata_null_columns)
 
+    #Printing the rows with alphatical values in the 'Value' column
     print("\nThese rows have alphatical values in the 'Value' column: \n", dfdata[dfdata['Value'].str.isalpha()])
 
 
+#Function including docstring that will prepare the data for use in the data visualisation dashboard
 def prepare_df(dfdata):
     """The raw dataset is prepared for use in the data visualisation dashboard
     
@@ -43,10 +51,10 @@ def prepare_df(dfdata):
     """
 
     print('\nPREPARED DATASET INFORMATION\n')
+
+    #The rows with null values are removed and to check this, the number of null values in each column is printed
     df_dropna = dfdata.dropna()
     print("\nThe number of null values in each column is: \n", df_dropna.isnull().sum())
-
-    #TODO: Explain the following code in the pdf
 
     #Remove the rows where the 'Academic Year' is '2015/16' or '2016/17' or '2017/18'
     df_dropna = df_dropna[df_dropna['Academic Year'] != '2015/16']
@@ -56,45 +64,66 @@ def prepare_df(dfdata):
     #Remove the rows where 'Country of HE provider' is not 'England'
     df_dropna = df_dropna[df_dropna['Country of HE provider'] == 'England']
 
+    #Print the number or rows and columns in the dataset after removing the rows of universities 
+    # not in England and removing all the data from before 2018/19
     print('\n The shape of the prepared dataset is: \n', df_dropna.shape)
 
+    #Rename the 'Table' column to 'Class' and replace the values 
+    # in the 'Class' column with the names of the classes
     df_class_column = df_dropna.rename(columns={'Table':'Class'})
     df_table_replaced = df_class_column.replace({'Table-1': 'Building and spaces',
                                             'Table-2': 'Energy',
                                             'Table-3': 'Emissions and waste',
                                             'Table-4': 'Transport and environment',
                                             'Table-5': 'Finances and people'})
+    
+    #Print the columns of the dataset after renaming the 'Table' 
+    # column to 'Class' and replacing the values
     print('\nThe columns of the prepared dataset are: \n', df_table_replaced.columns)
+
+    #Remove the percentage sign from the end of the values in the 'Value' column
     df_table_replaced.loc[:, 'Value'] = df_table_replaced['Value'].str.rstrip('%')
     
     #TODO: Explain this in the pdf
+    #There are som rows with alphabetical values in the 'Value' column. The 
+    # majority of these rows will be replaced with a numerical rating system to 
+    # make them easier to analyse.
 
+    #The method used to calculated scope 3 emissions is rated from Basic to Detailed 
+    # but this is replaced with numbers to make it easier to analyse
     df_table_replaced['Value'] = df_table_replaced['Value'].apply(lambda x: 
                                                                   1 if x == 'Basic' 
                                                                     else (2 if x == 'Medium' 
                                                                     else (3 if x == 'Detailed' 
                                                                     else x)))
     
+    #There are various categories related to HEIs environmental management with 'Yes' or'No' values. 
+    # The Fairtrasde accreditation existence category also includes the value 'Working towards 
+    # accreditation'. Again, these are replaced with numbers to make it easier to analyse.
     df_table_replaced['Value'] = df_table_replaced['Value'].apply(lambda x: 
                                                                   0 if x == 'No' 
                                                                     else (0.5 if x == 'Working towards accreditation' 
                                                                     else (1 if x == 'Yes' 
                                                                     else x)))
     
+
     #TODO:Explain this in the pdf
+    #The remaining rows with alphabetical values in the 'Value' column are printed
     non_numeric_rows = df_table_replaced[pd.to_numeric(df_table_replaced['Value'], errors='coerce').isna()]
     print("\n The rows with non numeric values in the 'Vaue' column are", non_numeric_rows)
     
     df_prepared = df_table_replaced
 
+    #Print the data types of the columns in the dataset after cleaning
     print("\nThe data types of the prepared dataset are: \n", df_prepared.dtypes)
 
+    #Save the prepared dataset to a csv file
     prepared_dataset_filepath = Path(__file__).parent.joinpath('dataset','dataset_prepared.csv')
     df_prepared.to_csv(prepared_dataset_filepath, index=False)
 
     return df_prepared
 
-#Function including docstring that will explore the data by drawing plots to undertand if there are any outliers
+#Function including docstring that will explore the data by drawing stripplots to undertand if there are any outliers
 def explore_data(df_prepared):
     """ The data is explored by drawing plots to understand if there are any outliers
     
@@ -148,10 +177,10 @@ def explore_data(df_prepared):
             for i, (category, category_group) in enumerate(class_df.groupby('Category')):
                 if figure_num * max_subplots_per_figure <= i < (figure_num + 1) * max_subplots_per_figure:
                     ax = axes[current_subplot // num_columns, current_subplot % num_columns]
-                    x_values = [0] * len(category_group)  # Create a list of zeros as x values (unconnected points)
-                    y_values = category_group['Value']
-                    # Use scatter to set the opacity (alpha) for points
-                    ax.scatter(x_values, y_values, marker='o', alpha=0.15, s=150, c='green', jitter=True)
+
+                    # Create a Seaborn stripplot for the category
+                    sns.stripplot(data=category_group, x=[0] * len(category_group), y='Value', ax=ax, alpha=0.5, jitter=True, color='green', size=7)
+
                     ax.set_title(f'{category}')
                     ax.set_ylabel('Value')
 
@@ -176,7 +205,7 @@ def explore_data(df_prepared):
 
             # Close the current figure to release resources
             plt.close(fig)
-
+    
 
 
 if __name__ == "__main__":
