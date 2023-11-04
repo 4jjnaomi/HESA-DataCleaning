@@ -8,7 +8,6 @@ import seaborn as sns
 
 pd.set_option('display.max_columns', None)
 
-
 def understand_df(dfdata):
     """
     Prints information about the given dataframe, including its shape, columns, first and last 5 rows,
@@ -16,7 +15,7 @@ def understand_df(dfdata):
     and number of null values in each column. Also identifies any rows with non-numeric values in the 'Value' column.
     
     Args:
-    dfdata (pandas.DataFrame): The dataframe to be analyzed.
+        dfdata (pandas.DataFrame): The raw dataframe to be analysed.
     """
     # Print basic information about the dataframe
     print('\nRAW DATASET INFORMATION')
@@ -42,11 +41,11 @@ def is_numeric_or_nan(value):
     """
     Check if a given value is numeric or NaN.
 
-    Parameters:
-    value (any): The value to check.
+    Args:
+        value (any): The value to check.
 
     Returns:
-    bool: True if the value is numeric or NaN, False otherwise.
+        bool: True if the value is numeric or NaN, False otherwise.
     """
     try:
         # Attempt to convert the value to a float
@@ -58,13 +57,13 @@ def is_numeric_or_nan(value):
 def prepare_df(dfdata):
     """
     This function prepares the input dataframe by cleaning, renaming, rearranging, converting and saving the data.
-    It prints out information about the prepared dataset such as the number of null values, columns and data types.
+    It prints out information about the prepared dataset such as the number of null values and columns.
 
     Args:
-    dfdata (pandas.DataFrame): The input dataframe to be prepared.
+        dfdata (pandas.DataFrame): The input dataframe to be prepared.
 
     Returns:
-    pandas.DataFrame: The prepared dataframe.
+        pandas.DataFrame: The prepared dataframe.
     """
     print('\nPREPARED DATASET INFORMATION')
     # Clean the data
@@ -92,10 +91,10 @@ def clean_data(dfdata):
     4. Returns the cleaned dataframe
     
     Args:
-    dfdata (pandas.DataFrame): The input dataframe to be cleaned
+        dfdata (pandas.DataFrame): The input dataframe to be cleaned
     
     Returns:
-    pandas.DataFrame: The cleaned dataframe
+        pandas.DataFrame: The cleaned dataframe
     """
     # Remove any rows with missing values
     df_clean = dfdata.dropna()
@@ -128,11 +127,11 @@ def keep_england_data(dfdata):
     """
     Returns a new DataFrame containing only the rows where the 'Country of HE provider' column is 'England'.
     
-    Parameters:
-    dfdata (pandas.DataFrame): The DataFrame to filter.
+    Args:
+        dfdata (pandas.DataFrame): The DataFrame to filter.
     
     Returns:
-    pandas.DataFrame: A new DataFrame containing only the rows where the 'Country of HE provider' column is 'England'.
+        pandas.DataFrame: A new DataFrame containing only the rows where the 'Country of HE provider' column is 'England'.
     """
     return dfdata[dfdata['Country of HE provider'] == 'England']
 
@@ -165,10 +164,10 @@ def rearrange_columns(dfdata):
     Rearranges the columns of a given dataframe such that the 'Class' column is moved to the 5th index.
 
     Args:
-    dfdata (pandas.DataFrame): The dataframe to rearrange.
+        dfdata (pandas.DataFrame): The dataFrame to rearrange.
 
     Returns:
-    pandas.DataFrame: The rearranged dataframe.
+        pandas.DataFrame: The rearranged dataFrame.
     """
     # Get the 'Class' column
     class_column = dfdata['Class']
@@ -193,10 +192,10 @@ def convert_value_column(dfdata):
     It then identifies any rows with non-numeric values in the 'Value' column and prints them to the console.
     
     Args:
-    - dfdata: pandas dataframe containing the data to be processed
+        dfdata (pandas.DataFrame): The Dataframe containing the data to be processed
     
     Returns:
-    - dfdata: pandas dataframe with the 'Value' column converted to numeric values
+        pandas.DataFrame: The Dataframe with the 'Value' column converted to numeric values
     """
     
     # Remove percentage sign from 'Value' column
@@ -252,7 +251,7 @@ def explore_data(dfdata):
     Prepare the input dataframe by removing non-numerical data and create visualizations for the prepared data.
 
     Args:
-        dfdata (pandas.DataFrame): The input dataframe to be explored.
+        dfdata (pandas.DataFrame): The input DataFrame to be explored.
     """
     df_prepared = remove_non_numerical(dfdata)
     create_data_visualizations(df_prepared)
@@ -263,10 +262,10 @@ def remove_non_numerical(dfdata):
     Converts the 'Value' column of the resulting dataframe to float64 data type.
     
     Args:
-    dfdata (pandas.DataFrame): Input dataframe
+        dfdata (pandas.DataFrame): The input DataFrame
     
     Returns:
-    pandas.DataFrame: Dataframe with non-numerical rows removed and 'Value' column converted to float64 data type.
+        pandas.DataFrame: The Dataframe with non-numerical rows removed and 'Value' column converted to float64 data type.
     """
     df_prepared = dfdata[dfdata['Category'] != 'Environmental management system external verification']
     df_numeric_values = df_prepared.astype({'Value': 'float64'})
@@ -274,13 +273,10 @@ def remove_non_numerical(dfdata):
 
 def create_data_visualizations(df_numeric_values):
     """
-    Creates visualizations for the given numeric dataframe.
+    Creates visualizations for the given numeric DataFrame.
 
     Args:
-        df_numeric_values (pandas.DataFrame): The numeric dataframe to visualize.
-
-    Returns:
-        None
+        df_numeric_values (pandas.DataFrame): The numeric DataFrame to visualize.
     """
     # Set the number of columns to display in each row of subplots
     num_columns = 5
@@ -299,10 +295,10 @@ def separate_data_by_class(dfdata):
     Separates the input dataframe into separate dataframes based on the unique values in the 'Class' column.
 
     Args:
-    dfdata (pandas.DataFrame): The input dataframe to be separated.
+        dfdata (pandas.DataFrame): The input DataFrame to be separated.
 
     Returns:
-    dict: A dictionary where the keys are the unique values in the 'Class' column and the values are the corresponding dataframes.
+        dict: A dictionary where the keys are the unique values in the 'Class' column and the values are the corresponding DataFrames.
     """
     # Create an empty dictionary to store the separated dataframes
     class_data = {}
@@ -320,10 +316,10 @@ def create_subplots(class_data, num_columns, max_subplots_per_figure, save_dir):
     Create subplots for each category in the given class data and save them as separate figures.
 
     Args:
-    class_data (dict): A dictionary containing the data for each class.
-    num_columns (int): The number of columns to use for the subplots.
-    max_subplots_per_figure (int): The maximum number of subplots to include in each figure.
-    save_dir (str): The directory to save the figures in.
+        class_data (dict): A dictionary containing the data for each class.
+        num_columns (int): The number of columns to use for the subplots.
+        max_subplots_per_figure (int): The maximum number of subplots to include in each figure.
+        save_dir (str): The directory to save the figures in.
     """
     # Loop through each class in the class data
     for class_name, class_df in class_data.items():
