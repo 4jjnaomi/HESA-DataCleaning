@@ -188,8 +188,9 @@ def rearrange_columns(dfdata):
 def convert_value_column(dfdata):
     """
     This function converts the 'Value' column of a given dataframe to numeric values.
-    It removes the percentage sign from the values and applies the 'convert_to_numeric' function to convert them to numeric values.
-    It then identifies any rows with non-numeric values in the 'Value' column and prints them to the console.
+    It removes the percentage sign from the values and applies the 'convert_to_numeric'
+    function to convert them to numeric values. It then identifies any rows 
+    with non-numeric values in the 'Value' column and prints them to the console.
     
     Args:
         dfdata (pandas.DataFrame): The Dataframe containing the data to be processed
@@ -258,7 +259,8 @@ def explore_data(dfdata):
 
 def remove_non_numerical(dfdata):
     """
-    Removes rows from the input dataframe that have 'Environmental management system external verification' as the Category value.
+    Removes rows from the input dataframe that have 'Environmental management system 
+    external verification' as the Category value.
     Converts the 'Value' column of the resulting dataframe to float64 data type.
     
     Args:
@@ -357,7 +359,8 @@ def create_subplots(class_data, num_columns, max_subplots_per_figure, save_dir):
                     ax = axes[current_subplot // num_columns, current_subplot % num_columns]
 
                     # Create a Seaborn stripplot for the category
-                    sns.stripplot(data=category_group, x=[0] * len(category_group), y='Value', ax=ax, alpha=0.5, jitter=True, color='green', size=7)
+                    sns.stripplot(data=category_group, x=[0] * len(category_group), y='Value',  
+                                  ax=ax, alpha=0.5, jitter=True, color='green', size=7)
 
                     # Set the title and y-axis label for the subplot
                     ax.set_title(f'{category}')
