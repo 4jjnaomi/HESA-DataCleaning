@@ -5,6 +5,7 @@ matplotlib.use('TkAgg')
 import matplotlib.pyplot as plt
 import pandas as pd
 import seaborn as sns
+import numpy as np
 
 pd.set_option('display.max_columns', None)
 
@@ -243,8 +244,18 @@ def save_cleaned_data(dfdata):
     Returns:
         pandas.DataFrame: The cleaned dataset.
     """
-    prepared_dataset_filepath = Path(__file__).parent.joinpath('dataset', 'dataset_prepared.csv')
-    dfdata.to_csv(prepared_dataset_filepath, index=False)
+
+    heidf_with_duplicates = dfdata[['UKPRN', 'HE Provider', 'Region of HE provider']].copy()
+    hei_df = heidf_with_duplicates.drop_duplicates()
+    hei_df[['lat', 'lon']] = None
+    hei_dataset_filepath = Path(__file__).parent.joinpath('dataset', 'hei_data.csv')
+    hei_df.to_csv(hei_dataset_filepath, index=False)
+
+    entrydf = dfdata[['Academic Year', 'Class', 'Category marker', 'Category', 'Value', 'UKPRN', 'HE Provider']].copy()
+    entrydf.insert(0, 'id', range(1, 1 + len(entrydf)), )
+    entry_dataset_filepath = Path(__file__).parent.joinpath('dataset', 'entry_data.csv')
+    entrydf.to_csv(entry_dataset_filepath, index=False)
+
     return dfdata
 
 def explore_data(dfdata):
